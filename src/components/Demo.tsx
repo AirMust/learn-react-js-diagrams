@@ -44,8 +44,12 @@ const Diagrams: FC<WrapDiagramProps> = memo(({ engine, ref }) => {
       node1.addPort(port1)
       node1.setPosition(100, 100)
 
-      const port3 = node3.addOutPort('Out')
-
+	  const port3 = new CustomPort({
+        name: 'Out 1(number)',
+        type: 'number',
+        isIn: false
+      })
+	  node3.addPort(port3)
       //3-B) create another default node
       const node2 = new DefaultNodeModel('Node 2', 'rgb(192,255,0)')
       const port2 = new CustomPort({
@@ -98,30 +102,8 @@ export const DemoComponent: FC = memo(() => {
     )
 
   engine.getModel().registerListener({
-    linksUpdated: (l: any) => {
-    //   const link: LinkModel = l?.link
-    //   //   link.remove();
-    //   const nodeSourse = link
-    //     .getSourcePort()
-    //     .getParent()
-    //     .getOptions()
-    //   //   const nodeTarget = link.getTargetPort().getParent();
-    //   const p1 = link.getSourcePort()
-    //   const p2 = link.getTargetPort()
-    //   console.log(link, p1, p2)
-    //   if (p1 && p2) {
-    //     const sourceFormat = (p1 as CustomPort)?.getFormat()
-    //     const targetFormat = (p2 as CustomPort)?.getFormat()
-	// 	console.log(sourceFormat, targetFormat)
-    //     if (sourceFormat !== targetFormat) {
-    //       link.remove()
-    //     }
-
-    //   }
-    },
-    nodesUpdated: (n: any) => {
-      console.log('node', n)
-    }
+    linksUpdated: (l: any) => {},
+    nodesUpdated: (n: any) => {}
   })
   const ref = useRef(null)
   //   const { isUp } = useDiagrams(0)

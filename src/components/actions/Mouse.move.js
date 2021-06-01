@@ -35,6 +35,7 @@ export class CustomMouseMoveItemsAction extends Action {
   checkLinks (event) {
     const model = this.engine.getModel()
     const links = model.getLinks()
+	console.log(model.getSelectionEntities())
     links.forEach(this.checkLink);
   }
 }
