@@ -21,21 +21,26 @@ export class CustomMouseMoveItemsAction extends Action {
       }
     })
   }
-  checkLink (link){
-	const soursePort = link.getSourcePort()
+  checkLink (link) {
+    const soursePort = link.getSourcePort()
     const targetPort = link.getTargetPort()
+    console.log(soursePort, targetPort)
     if (soursePort && targetPort) {
       const sourceFormat = soursePort?.getFormat()
       const targetFormat = targetPort?.getFormat()
       if (sourceFormat !== targetFormat) {
         link.remove()
       }
+    } else if (!link.getOptions().selected) {
+      console.log(link)
+      //   setTimeout(link.remove(), 0)
     }
   }
   checkLinks (event) {
-    const model = this.engine.getModel()
-    const links = model.getLinks()
-	console.log(model.getSelectionEntities())
-    links.forEach(this.checkLink);
+    if (event.target?.localName !== 'circle') {
+      const model = this.engine.getModel()
+      const links = model.getLinks()
+      links.forEach(this.checkLink)
+    }
   }
 }

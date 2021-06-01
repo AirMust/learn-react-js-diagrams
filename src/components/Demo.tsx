@@ -5,7 +5,9 @@ import createEngine, {
   DiagramEngine,
   DefaultLinkModel,
   LabelModel,
-  LinkModel
+  LinkModel,
+  PortModel,
+  PortModelGenerics
 } from '@projectstorm/react-diagrams'
 import './DemoComponent.css'
 import {
@@ -19,6 +21,7 @@ import { CustomDeleteItemsAction } from './actions/Delete.actions'
 import { CustomMouseMoveItemsAction } from './actions/Mouse.move'
 import { CustomNode } from './node'
 import { CustomPort } from './node/CustomPort'
+import { panel } from './Data.mock'
 
 type WrapDiagramProps = {
   engine: DiagramEngine
@@ -26,62 +29,61 @@ type WrapDiagramProps = {
 }
 
 const Diagrams: FC<WrapDiagramProps> = memo(({ engine, ref }) => {
-  useEffect(() => {
-    const model = engine.getModel()
-    if (model) {
-      const node1 = new CustomNode({
-        name: 'Node 1',
-        type: 'stream'
-      })
-      const node3 = new DefaultNodeModel('Node 1', 'red')
+  //   useEffect(() => {
+  //     const model = engine.getModel()
+  //     if (model) {
+  //       const node1 = new CustomNode({
+  //         name: 'Node 1'
+  //       })
+  //       const node3 = new DefaultNodeModel('Node 1', 'red')
 
-      const port1 = new CustomPort({
-        name: 'Out 1',
-        type: 'stream',
-        isIn: false
-      })
+  //       const port1 = new CustomPort({
+  //         name: 'Out 1',
+  //         type: 'stream',
+  //         isIn: false
+  //       })
 
-      node1.addPort(port1)
-      node1.setPosition(100, 100)
+  //       node1.addPort(port1)
+  //       node1.setPosition(100, 100)
 
-	  const port3 = new CustomPort({
-        name: 'Out 1(number)',
-        type: 'number',
-        isIn: false
-      })
-	  node3.addPort(port3)
-      //3-B) create another default node
-      const node2 = new DefaultNodeModel('Node 2', 'rgb(192,255,0)')
-      const port2 = new CustomPort({
-        name: 'In 1(stream)',
-        type: 'stream',
-        isIn: true
-      })
+  //       const port3 = new CustomPort({
+  //         name: 'Out 1(number)',
+  //         type: 'number',
+  //         isIn: false
+  //       })
+  //       node3.addPort(port3)
+  //       //3-B) create another default node
+  //       const node2 = new DefaultNodeModel('Node 2', 'rgb(192,255,0)')
+  //       const port2 = new CustomPort({
+  //         name: 'In 1(stream)',
+  //         type: 'stream',
+  //         isIn: true
+  //       })
 
-      const port4 = new CustomPort({
-        name: 'In 2 (number)',
-        type: 'number',
-        isIn: true
-      })
+  //       const port4 = new CustomPort({
+  //         name: 'In 2 (number)',
+  //         type: 'number',
+  //         isIn: true
+  //       })
 
-      node2.addPort(port2)
-      node2.addPort(port4)
+  //       node2.addPort(port2)
+  //       node2.addPort(port4)
 
-      node2.setPosition(400, 100)
+  //       node2.setPosition(400, 100)
 
-      //3-C) link the 2 nodes together
-      let link1 = port1.link(port2)
+  //       //3-C) link the 2 nodes together
+  //       let link1 = port1.link(port2)
 
-      //4) add the models to the root graph
-      model.addAll(node1, node2, node3, link1)
+  //       //4) add the models to the root graph
+  //       model.addAll(node1, node2, node3, link1)
 
-      // model.registerListener({
-      // 	eventDidFire: 'model eventDidFire'
-      // });
-      //5) load model into engine
-      engine.repaintCanvas()
-    }
-  }, [engine])
+  //       // model.registerListener({
+  //       // 	eventDidFire: 'model eventDidFire'
+  //       // });
+  //       //5) load model into engine
+  //       engine.repaintCanvas()
+  //     }
+  //   }, [engine])
   return (
     engine.getModel() && (
       <CanvasWidget engine={engine} className={'canvas-widget'} ref={ref} />
@@ -92,6 +94,38 @@ const Diagrams: FC<WrapDiagramProps> = memo(({ engine, ref }) => {
 export const DemoComponent: FC = memo(() => {
   const engine = createEngine({ registerDefaultDeleteItemsAction: false })
   const model = new DiagramModel()
+
+  panel.nodes.forEach(metaNode => {
+    const node = new CustomNode({ name: metaNode.name })
+    const lists = Object.entries(metaNode.ports)
+    model.addNode(node)
+    lists.forEach(([key, data]) => {
+      const port = new CustomPort({
+        id: key,
+        ...data
+      })
+      node.addPort(port)
+    })
+  })
+  panel.links.forEach(link => {
+    const { input, output } = link
+    let p1 = null
+    let p2 = null
+    model.getNodes().forEach(nodes => {
+      Object.values(nodes.getPorts()).find(port => {
+        if (port.getID() === input) {
+          p1 = port
+        }
+        if (port.getID() === output) {
+          p2 = port
+        }
+      })
+    })
+    if (p1 && p2) {
+      let link: LinkModel = (p1 as any).link(p2)
+      model.addLink(link)
+    }
+  })
   engine.setModel(model)
   engine.getActionEventBus().registerAction(new CustomDeleteItemsAction())
   engine.getActionEventBus().registerAction(new CustomMouseMoveItemsAction())

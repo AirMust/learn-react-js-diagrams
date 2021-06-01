@@ -1,13 +1,14 @@
 import { DefaultPortModel } from '@projectstorm/react-diagrams'
 
 export class CustomPort extends DefaultPortModel {
-  constructor ({ name, type, isIn }) {
+  constructor ({ name, formatData, isInput, id }) {
     // here I don't have expected options after deserialize
     super({
-      name: name,
+      name: `${name}/${formatData}`,
       color: 'rgb(0,192,255)',
-      format: type,
-      in: isIn
+      format: formatData,
+      in: isInput,
+      id: id,
     })
   }
   getFormat() {
