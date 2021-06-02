@@ -7,7 +7,9 @@ import createEngine, {
   LabelModel,
   LinkModel,
   PortModel,
-  PortModelGenerics
+  PortModelGenerics,
+  DefaultPortModel,
+  PortModelAlignment
 } from '@projectstorm/react-diagrams'
 import './DemoComponent.css'
 import {
@@ -22,6 +24,11 @@ import { CustomMouseMoveItemsAction } from './actions/Mouse.move'
 import { CustomNode } from './node'
 import { CustomPort } from './node/CustomPort'
 import { panel } from './Data.mock'
+import { AdvancedLinkFactory, AdvancedPortModel } from './node/CustomLink'
+import { SimplePortFactory } from './custom/SimplePortFactory'
+import { DiamondPortModel } from './custom/DiamondPortModel'
+import { DiamondNodeFactory } from './custom/DiamondNodeFactory'
+import { DiamondNodeModel } from './custom/DiamondNodeModel'
 
 type WrapDiagramProps = {
   engine: DiagramEngine
@@ -126,6 +133,49 @@ export const DemoComponent: FC = memo(() => {
       model.addLink(link)
     }
   })
+
+  engine.getLinkFactories().registerFactory(new AdvancedLinkFactory())
+  engine.getPortFactories().registerFactory(
+    new SimplePortFactory(
+      'diamond',
+      config => new DiamondPortModel(PortModelAlignment.LEFT),
+    )
+  )
+  engine.getPortFactories().registerFactory(
+    new SimplePortFactory(
+      'diamond',
+      config => new DiamondPortModel(PortModelAlignment.BOTTOM),
+    )
+  )
+  engine.getNodeFactories().registerFactory(new DiamondNodeFactory())
+
+  const node5 = new DiamondNodeModel()
+  // create some nodes
+  // var node1 = new DefaultNodeModel('Source', 'rgb(0,192,255)')
+  // let port1 = node1.addPort(new AdvancedPortModel(false, 'out-1', 'Out thick'))
+  // let port2 = node1.addPort(new DefaultPortModel(false, 'out-2', 'Out default'))
+  // node1.setPosition(100, 100)
+
+  // var node2 = new DefaultNodeModel('Target', 'rgb(192,255,0)')
+  // var port3 = node2.addPort(new AdvancedPortModel(true, 'in-1', 'In thick'))
+  // var port4 = node2.addPort(new DefaultPortModel(true, 'in-2', 'In default'))
+  // node2.setPosition(300, 100)
+
+  // var node3 = new DefaultNodeModel('Source', 'rgb(0,192,255)')
+  // node3.addPort(new AdvancedPortModel(false, 'out-1', 'Out thick'))
+  // node3.addPort(new DefaultPortModel(false, 'out-2', 'Out default'))
+  // node3.setPosition(100, 200)
+
+  // var node4 = new DefaultNodeModel('Target', 'rgb(192,255,0)')
+  // node4.addPort(new AdvancedPortModel(true, 'in-1', 'In thick'))
+  // node4.addPort(new DefaultPortModel(true, 'in-2', 'In default'))
+  // node4.setPosition(300, 200)
+
+  // model.addAll(port1.link(port3), port2.link(port4));
+
+  // add everything else
+  model.addAll(node5)
+
   engine.setModel(model)
   engine.getActionEventBus().registerAction(new CustomDeleteItemsAction())
   engine.getActionEventBus().registerAction(new CustomMouseMoveItemsAction())

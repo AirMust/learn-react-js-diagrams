@@ -1,0 +1,13 @@
+.node_diamon {
+	width: 16px;
+	height: 16px;
+	z-index: 10;
+	background: rgba(0, 0, 0, 0.5);
+	border-radius: 8px;
+	cursor: pointer;
+	border: 1px solid rgba(0, 0, 0, 0.5)
+}
+
+.node_diamon:hover {
+	background: rgb(192, 255, 0);
+}

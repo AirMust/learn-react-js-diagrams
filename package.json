@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.4.0",
+    "@emotion/styled": "^11.3.0",
     "@projectstorm/react-canvas-core": "^6.5.2",
     "@projectstorm/react-diagrams": "^6.5.2",
     "@testing-library/jest-dom": "^5.11.4",
@@ -42,5 +44,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-typescript": "^7.14.4",
+    "@emotion/babel-plugin": "^11.3.0"
   }
 }
