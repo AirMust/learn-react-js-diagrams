@@ -4,7 +4,7 @@ export class CustomPort extends DefaultPortModel {
   constructor ({ name, formatData, isInput, id }) {
     // here I don't have expected options after deserialize
     super({
-      name: `${name}/${formatData}`,
+      name: `${name}`,
       color: 'rgb(0,192,255)',
       format: formatData,
       in: isInput,

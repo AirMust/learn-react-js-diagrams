@@ -1,13 +1,81 @@
-.node_diamon {
-	width: 16px;
-	height: 16px;
+.port_diamon {
+	width: 24px;
+	height: 20px;
 	z-index: 10;
-	background: rgba(0, 0, 0, 0.5);
-	border-radius: 8px;
+	background: mediumpurple;
+	border-radius: 0px 8px 8px 0px;
 	cursor: pointer;
-	border: 1px solid rgba(0, 0, 0, 0.5)
+	display: block;
+	margin: 10;
+	text-align: center;
+	border: 1px solid rgba(0, 0, 0, 0.9);
 }
 
-.node_diamon:hover {
+.port_diamon_bg {
+	width: 26px;
+	height: 22px;
+	position: absolute;
+	background: rgba(0, 0, 0, 0.475);
+	display: block;
+	top: 0;
+	z-index: -1;
+}
+
+.port_diamon_text {
+	/* width: 24px; */
+	height: 22px;
+	z-index: 10;
+	background: rgba(0, 0, 0, 0.475);
+	border-radius: 0px 8px 8px 0px;
+	cursor: pointer;
+	display: block;
+	padding-left: 3px;
+	padding-right: 3px;
+	margin-top: 3px;
+	margin-bottom: 3px;
+	text-align: center;
+	/* border: 1px solid rgba(0, 0, 0, 0.5) */
+}
+
+.port_diamon:hover {
 	background: rgb(192, 255, 0);
+	box-shadow: 0 0 3px rgba(0,0,0,0.5);
+
+}
+
+.diamond-node {
+	display: grid;
+	grid-template-areas: "diamond-node_title diamond-node_title diamond-node_title diamond-node_title" "indicator1 diamond-node_input diamond-node_output indicator2";
+	grid-template-rows: 30px 1fr;
+	grid-template-columns: 25px 1fr 1fr 25px;
+	border: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.diamond-node:hover {
+	border: 1px solid rgb(0, 192, 255);
+}
+
+.diamond-node_title {
+	text-align: center;
+	grid-area: diamond-node_title;
+	margin: 10px;
+}
+
+.diamond-node_input {
+	grid-area: diamond-node_input;
+	margin-right: 10px;
+}
+
+.diamond-node_input_indicator {
+	grid-area: indicator1;
+}
+
+.diamond-node_output_indicator {
+	grid-area: indicator2;
+}
+
+.diamond-node_output {
+	margin-left: 10px;
+	grid-area: diamond-node_output;
+	text-align: end
 }

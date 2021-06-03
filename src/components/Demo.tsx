@@ -100,19 +100,22 @@ const Diagrams: FC<WrapDiagramProps> = memo(({ engine, ref }) => {
 
 export const DemoComponent: FC = memo(() => {
   const engine = createEngine({ registerDefaultDeleteItemsAction: false })
+  engine.getNodeFactories().registerFactory(new DiamondNodeFactory())
   const model = new DiagramModel()
 
+  const clad = engine.getNodeFactories().getFactories()[1]
   panel.nodes.forEach(metaNode => {
-    const node = new CustomNode({ name: metaNode.name })
-    const lists = Object.entries(metaNode.ports)
+    // const node = new CustomNode({ name: metaNode.name })
+    const node = clad.generateModel({initialConfig : {...metaNode} })
+    // const lists = Object.entries(metaNode.ports)
     model.addNode(node)
-    lists.forEach(([key, data]) => {
-      const port = new CustomPort({
-        id: key,
-        ...data
-      })
-      node.addPort(port)
-    })
+    // lists.forEach(([key, data]) => {
+    //   const port = new CustomPort({
+    //     id: key,
+    //     ...data
+    //   })
+    //   node.addPort(port)
+    // })
   })
   panel.links.forEach(link => {
     const { input, output } = link
@@ -129,27 +132,53 @@ export const DemoComponent: FC = memo(() => {
       })
     })
     if (p1 && p2) {
+      console.log(p1, p2)
+
       let link: LinkModel = (p1 as any).link(p2)
       model.addLink(link)
     }
   })
 
   engine.getLinkFactories().registerFactory(new AdvancedLinkFactory())
-  engine.getPortFactories().registerFactory(
-    new SimplePortFactory(
-      'diamond',
-      config => new DiamondPortModel(PortModelAlignment.LEFT),
-    )
-  )
-  engine.getPortFactories().registerFactory(
-    new SimplePortFactory(
-      'diamond',
-      config => new DiamondPortModel(PortModelAlignment.BOTTOM),
-    )
-  )
-  engine.getNodeFactories().registerFactory(new DiamondNodeFactory())
 
-  const node5 = new DiamondNodeModel()
+  // engine.getPortFactories()
+  // engine
+  //   .getPortFactories()
+  //   .registerFactory(
+  //     new SimplePortFactory(
+  //       'diamond',
+  //       config => new DiamondPortModel(PortModelAlignment.BOTTOM)
+  //     )
+  //   )
+
+
+  const ports = {
+    '559b9c3e-9ec2-4fd4-bb1a-69c036f92d42': {
+      name: 'Port1',
+      formatData: 'number',
+      isInput: false
+    },
+    '8fc5da74-09f0-4fd9-8728-9ca654b005ea': {
+      name: 'Port2',
+      formatData: 'stream',
+      isInput: false
+    },
+    'd2c90dd7-3ad6-4cf1-8e90-4d6a029ff2cd': {
+      name: 'Port3',
+      formatData: 'boolean',
+      isInput: true
+    },
+    '9c4ae3f2-74d9-33df-896b-f16173ad7717': {
+      name: 'Port4',
+      formatData: 'stream',
+      isInput: false
+    }
+  }
+
+  // const clad = engine.getNodeFactories().getFactories()[1]
+  // const node3 = clad.generateModel({initialConfig : {title: '1213', ports} })
+  // console.log(node3)
+  // const node5 = new DiamondNodeModel({ title: 100 })
   // create some nodes
   // var node1 = new DefaultNodeModel('Source', 'rgb(0,192,255)')
   // let port1 = node1.addPort(new AdvancedPortModel(false, 'out-1', 'Out thick'))
@@ -174,7 +203,7 @@ export const DemoComponent: FC = memo(() => {
   // model.addAll(port1.link(port3), port2.link(port4));
 
   // add everything else
-  model.addAll(node5)
+  // model.addAll(node3)
 
   engine.setModel(model)
   engine.getActionEventBus().registerAction(new CustomDeleteItemsAction())

@@ -3,132 +3,108 @@ import { DiamondNodeModel } from './DiamondNodeModel'
 import {
   DiagramEngine,
   PortModelAlignment,
+  PortModelGenerics,
   PortWidget
 } from '@projectstorm/react-diagrams'
 import styled from '@emotion/styled'
 import './Custom.css'
+import { DiamondPortModel } from './DiamondPortModel'
+import { memo, useCallback, FC, useMemo } from 'react'
+import { PortModel } from 'storm-react-diagrams'
 
 export interface DiamondNodeWidgetProps {
   node: DiamondNodeModel
   engine: DiagramEngine
-  size: number
 }
 
-// namespace S {
-//   export const Port = styled.div`
-//     width: 16px;
-//     height: 16px;
-//     z-index: 10;
-//     background: rgba(0, 0, 0, 0.5);
-//     border-radius: 8px;
-//     cursor: pointer;
-//     &:hover {
-//       background: rgba(0, 0, 0, 1);
-//     }
-//   `
-// }
+type MetaPortProps = {
+  name: string
+  indicator: any
+}
 
-/**
- * @author Dylan Vorster
- */
-export class DiamondNodeWidget extends React.Component<DiamondNodeWidgetProps> {
-  render () {
-    // console.log(this.props.node.getPort(PortModelAlignment.LEFT))
-    const portLeft = this.props.node.getPort(PortModelAlignment.LEFT)
-    const portRight = this.props.node.getPort(PortModelAlignment.RIGHT)
-    const portTop = this.props.node.getPort(PortModelAlignment.TOP)
+export const DiamondNodeWidget: FC<DiamondNodeWidgetProps> = memo(
+  ({ node, engine }) => {
+    const { name } = node.meta
+    const ports = node.getPorts()
 
-    const portBottom = this.props.node.getPort(PortModelAlignment.BOTTOM)
+    const getMetaProps = (flag: boolean) => {
+      const dataPorts = Object.values(ports)
+      const metaPorts: MetaPortProps[] = []
+      dataPorts.forEach(port => {
+        const option = port.getOptions() as any
+        if (option.in === flag) {
+          metaPorts.push({ indicator: port, name: port.getOptions().name })
+        }
+      })
+      return metaPorts
+    }
+
+    const inputIndicator = useCallback(
+      (flag: boolean) => {
+        const meta = getMetaProps(flag)
+        // console.log(meta[0].indicator.getOptions().format[0])
+        const control = meta.map(({ indicator }) => (
+          <PortWidget
+            port={indicator}
+            engine={engine}
+            style={{
+              marginTop: 3,
+              marginBottom: 3,
+              position: 'relative',
+              left: flag ? -1 : 0
+            }}
+          >
+            <div className='port_diamon_bg'></div>
+            <div
+              className='port_diamon'
+              style={{
+                borderRadius: !flag ? '8px 0px 0px 8px' : '0px 8px 8px 0px'
+              }}
+            >
+              {indicator.getOptions().format[0]}
+            </div>
+          </PortWidget>
+        ))
+        return control
+      },
+      [node]
+    )
+
+    const inputName = useCallback(
+      (flag: boolean) => {
+        const meta = getMetaProps(flag)
+        const control = meta.map(({ name }) => (
+          <div
+            style={{
+              borderRadius: !flag ? '8px 0px 0px 8px' : '0px 8px 8px 0px'
+            }}
+            className={'port_diamon_text'}
+          >
+            {' '}
+            {name}
+          </div>
+        ))
+        return control
+      },
+      [node]
+    )
+
     return (
-      <div
-        className={'diamond-node'}
-        style={{
-          position: 'relative',
-          width: this.props.size,
-          height: this.props.size
-        }}
-      >
-        <svg
-          width={this.props.size}
-          height={this.props.size}
-          dangerouslySetInnerHTML={{
-            __html:
-              `
-          <g id="Layer_1">
-          </g>
-          <g id="Layer_2">
-            <polygon fill="mediumpurple" stroke="${
-              this.props.node.isSelected() ? 'rgb(0,192,255)' : 'black'
-            }" stroke-width="3" stroke-miterlimit="10" points="10,` +
-              this.props.size / 2 +
-              ` ` +
-              this.props.size / 2 +
-              `,10 ` +
-              (this.props.size - 10) +
-              `,` +
-              this.props.size / 2 +
-              ` ` +
-              this.props.size / 2 +
-              `,` +
-              (this.props.size - 10) +
-              ` "/>
-          </g>
-        `
-          }}
-        />
-        {portLeft && (
-          <PortWidget
-            style={{
-              top: this.props.size / 2 - 8,
-              left: -8,
-              position: 'absolute'
-            }}
-            port={portLeft}
-            engine={this.props.engine}
-          >
-            <div className='node_diamon' />
-          </PortWidget>
-        )}
-        {portTop && (
-          <PortWidget
-            style={{
-              left: this.props.size / 2 - 8,
-              top: -8,
-              position: 'absolute'
-            }}
-            port={portTop}
-            engine={this.props.engine}
-          >
-            <div className='node_diamon' />
-          </PortWidget>
-        )}
-        {portRight && (
-          <PortWidget
-            style={{
-              left: this.props.size - 8,
-              top: this.props.size / 2 - 8,
-              position: 'absolute'
-            }}
-            port={portRight}
-            engine={this.props.engine}
-          >
-            <div className='node_diamon' />
-          </PortWidget>
-        )}
-        {portBottom && (
-          <PortWidget
-            style={{
-              left: this.props.size / 2 - 8,
-              top: this.props.size - 8,
-              position: 'absolute'
-            }}
-            port={portBottom}
-            engine={this.props.engine}
-          >
-            <div className='node_diamon' />
-          </PortWidget>
-        )}
+      <div className='diamond-node' style={{ position: 'relative' }}>
+        <p className='diamond-node_title'>{name}</p>
+        <div className='diamond-node_input_indicator'>
+          {inputIndicator(true)}
+        </div>
+        <div className='diamond-node_input'>{inputName(true)}</div>
+        <div className='diamond-node_output_indicator'>
+          {inputIndicator(false)}
+        </div>
+        <div className='diamond-node_output'>{inputName(false)}</div>
+
+        <div>
+          <div></div>
+        </div>
       </div>
     )
   }
-}
+)

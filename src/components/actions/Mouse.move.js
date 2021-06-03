@@ -25,16 +25,17 @@ export class CustomMouseMoveItemsAction extends Action {
     const soursePort = link.getSourcePort()
     const targetPort = link.getTargetPort()
     console.log(soursePort, targetPort)
-    if (soursePort && targetPort) {
-      const sourceFormat = soursePort?.getFormat()
-      const targetFormat = targetPort?.getFormat()
-      if (sourceFormat !== targetFormat) {
-        link.remove()
-      }
-    } else if (!link.getOptions().selected) {
-      console.log(link)
-      //   setTimeout(link.remove(), 0)
-    }
+    // TODO: !
+    // if (soursePort && targetPort) {
+    //   const sourceFormat = soursePort?.getFormat()
+    //   const targetFormat = targetPort?.getFormat()
+    //   if (sourceFormat !== targetFormat) {
+    //     link.remove()
+    //   }
+    // } else if (!link.getOptions().selected) {
+    //   console.log(link)
+    //   //   setTimeout(link.remove(), 0)
+    // }
   }
   checkLinks (event) {
     if (event.target?.localName !== 'circle') {

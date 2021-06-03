@@ -37,9 +37,34 @@ export const panel = {
           name: 'Port2',
           formatData: 'stream',
           isInput: true
+        },
+        '7a4a778c-7057-45d9-89cc-befa18819674': {
+          name: 'Port3',
+          formatData: 'stream',
+          isInput: false
         }
       }
-    }
+    },
+    {
+      name: 'Cusom Node 3',
+      ports: {
+        '26cfa947-d8bd-47a4-be30-6e0e728c2163': {
+          name: 'Port1',
+          formatData: 'number',
+          isInput: true
+        },
+        '2a4a778c-7057-4bd9-89cc-befa18819674': {
+          name: 'Port2',
+          formatData: 'stream',
+          isInput: true
+        },
+        '2a4a778c-7057-45d9-89cc-befa18819674': {
+          name: 'Port3',
+          formatData: 'stream',
+          isInput: false
+        }
+      }
+    },
   ],
   links: [
     {
