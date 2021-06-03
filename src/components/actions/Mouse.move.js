@@ -1,4 +1,4 @@
-import { Action, ActionEvent, InputType } from '@projectstorm/react-canvas-core'
+import { Action, InputType } from '@projectstorm/react-canvas-core'
 
 // interface CustomDeleteItemsActionOptions {
 //   keyCodes?: number[]

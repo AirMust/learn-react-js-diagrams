@@ -31,17 +31,20 @@ export const panel = {
         'a6cfa947-d8bd-47a4-be30-6e0e728c2163': {
           name: 'Port1',
           formatData: 'number',
-          isInput: true
+          isInput: true,
+          required: false
         },
         '7a4a778c-7057-4bd9-89cc-befa18819674': {
           name: 'Port2',
           formatData: 'stream',
-          isInput: true
+          isInput: true,
+          required: false
         },
         '7a4a778c-7057-45d9-89cc-befa18819674': {
           name: 'Port3',
           formatData: 'stream',
-          isInput: false
+          isInput: false,
+          required: true
         }
       }
     },
@@ -51,29 +54,32 @@ export const panel = {
         '26cfa947-d8bd-47a4-be30-6e0e728c2163': {
           name: 'Port1',
           formatData: 'number',
-          isInput: true
+          isInput: true,
+          required: true
         },
         '2a4a778c-7057-4bd9-89cc-befa18819674': {
-          name: 'Port2',
+          name: 'Port2FDSFSD',
           formatData: 'stream',
-          isInput: true
+          isInput: true,
+          required: true
         },
         '2a4a778c-7057-45d9-89cc-befa18819674': {
           name: 'Port3',
           formatData: 'stream',
-          isInput: false
+          isInput: false,
+          required: true
         }
       }
-    },
+    }
   ],
   links: [
     {
       input: 'a6cfa947-d8bd-47a4-be30-6e0e728c2163',
       output: '559b9c3e-9ec2-4fd4-bb1a-69c036f99d42'
     },
-	{
-		input: '7a4a778c-7057-4bd9-89cc-befa18819674',
-		output: '8fc5da74-09f0-4fd9-8728-9ca634b005ea'
-	  }
+    {
+      input: '7a4a778c-7057-4bd9-89cc-befa18819674',
+      output: '8fc5da74-09f0-4fd9-8728-9ca634b005ea'
+    }
   ]
 }
