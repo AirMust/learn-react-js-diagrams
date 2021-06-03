@@ -1,4 +1,8 @@
-import { NodeModel, NodeModelGenerics } from '@projectstorm/react-diagrams'
+import {
+  DefaultPortModelOptions,
+  NodeModel,
+  NodeModelGenerics
+} from '@projectstorm/react-diagrams'
 import { MODEL_FF_NODE } from './ModelFFNode.factory'
 import { ModelFFPortModel } from '../port'
 
@@ -6,7 +10,7 @@ export interface ModelFFNodeModelGenerics {
   PORT: ModelFFPortModel
 }
 
-export type ModelFFPortModelProps = {
+export type ModelFFPortModelProps = DefaultPortModelOptions & {
   name: string
   formatData: string
   isInput: boolean

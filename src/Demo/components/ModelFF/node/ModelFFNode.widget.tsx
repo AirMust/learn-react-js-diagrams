@@ -1,17 +1,20 @@
 import * as React from 'react'
-import { ModelFFNodeModel } from './ModelFFNode.model'
+import { ModelFFNodeModel, ModelFFPortModelProps } from './ModelFFNode.model'
 import { DiagramEngine, PortWidget } from '@projectstorm/react-diagrams'
 import { memo, FC } from 'react'
 import { Divider, makeStyles } from '@material-ui/core'
 import clsx from 'clsx'
 import AccessAlarmIcon from '@material-ui/icons/AccessAlarm'
+import { useCallback } from 'react'
 export interface ModelFFNodeWidgetProps {
   node: ModelFFNodeModel
   engine: DiagramEngine
 }
 
 type MetaPortProps = {
-  name: string
+  options: ModelFFPortModelProps & {
+    isLink?: boolean
+  }
   indicator: any
 }
 
@@ -53,6 +56,9 @@ const useStyles = makeStyles(theme => ({
       borderColor: theme.palette.primary.light
     }
   },
+  selected: {
+    borderColor: theme.palette.primary.light
+  },
   portIsLink: {
     background: theme.palette.primary.main
   },
@@ -73,7 +79,7 @@ const useStyles = makeStyles(theme => ({
     },
     '& > div:nth-child(2)': {
       zIndex: 1,
-      background: theme.palette.primary.main,
+      background: theme.palette.grey[600],
       cursor: 'pointer',
       '&:hover': {
         background: theme.palette.primary.light
@@ -89,11 +95,29 @@ const useStyles = makeStyles(theme => ({
     margin: `${theme.spacing(0.5)}px 0px`,
     display: 'table'
   },
-  left: {
+  leftBorder: {
     borderRadius: `0px ${theme.spacing(1)}px ${theme.spacing(1)}px 0px`
   },
-  right: {
+  rightBorder: {
     borderRadius: `${theme.spacing(1)}px 0px 0px  ${theme.spacing(1)}px`
+  },
+  leftMargin: {
+    marginLeft: theme.spacing(1)
+  },
+  rightMargin: {
+    marginRight: theme.spacing(1)
+  },
+  leftRequiredOff: {
+    borderLeft: `4px solid ${theme.palette.error.main}`
+  },
+  rightRequiredOff: {
+    borderRight: `4px solid ${theme.palette.error.main}`
+  },
+  leftRequiredOn: {
+    borderLeft: `4px solid ${theme.palette.success.main}`
+  },
+  rightRequiredOn: {
+    borderRight: `4px solid ${theme.palette.success.main}`
   }
 }))
 
@@ -103,26 +127,45 @@ export const ModelFFNodeWidget: FC<ModelFFNodeWidgetProps> = memo(
 
     const { name } = node.meta
     const ports = node.getPorts()
-    console.log(node)
-    const getMetaProps = (flag: boolean) => {
-      const dataPorts = Object.values(ports)
-      const metaPorts: MetaPortProps[] = []
-      dataPorts.forEach(port => {
-        const option = port.getOptions() as any
-        if (option.alignment === (flag ? 'left' : 'right')) {
-          metaPorts.push({ indicator: port, name: (port.getOptions() as any).label })
-        }
-      })
-      return metaPorts
-    }
+    const getMetaProps = useCallback(
+      (flag: boolean) => {
+        const dataPorts = Object.values(ports)
+        const metaPorts: MetaPortProps[] = []
+        dataPorts.forEach(port => {
+          const option = port.getOptions() as any
+          if (option.in === flag) {
+            const options: MetaPortProps['options'] = port.getOptions() as ModelFFPortModelProps
+
+            options.isLink = Object.keys(port.getLinks()).length !== 0
+
+            metaPorts.push({
+              indicator: port,
+              options
+            })
+          }
+        })
+        return metaPorts
+      },
+      [ports, node]
+    )
 
     const indicatorControls = (flag: boolean) => {
       const meta = getMetaProps(flag)
-      const control = meta.map(({ indicator }) => (
+      console.log(meta)
+      const control = meta.map(({ indicator, options }) => (
         <PortWidget port={indicator} engine={engine} className={classes.port}>
           <div />
-          <div className={clsx(flag ? classes.left : classes.right)}>
-            {indicator.getOptions().format[0]}
+          <div
+            className={clsx(
+              { [classes.rightBorder]: !flag },
+              { [classes.leftBorder]: flag },
+              { [classes.rightRequiredOff]: !flag && options.required },
+              { [classes.leftRequiredOff]: flag && options.required },
+              { [classes.rightRequiredOn]: !flag && options?.isLink },
+              { [classes.leftRequiredOn]: flag && options?.isLink }
+            )}
+          >
+            {options.formatData[0]}
           </div>
         </PortWidget>
       ))
@@ -131,22 +174,24 @@ export const ModelFFNodeWidget: FC<ModelFFNodeWidgetProps> = memo(
 
     const nameControls = (flag: boolean) => {
       const meta = getMetaProps(flag)
-      const control = meta.map(({ name }) => (
+      const control = meta.map(({ options }) => (
         <div
           className={clsx(
-            flag ? classes.left : classes.right,
+            { [classes.rightBorder]: !flag },
+            { [classes.leftBorder]: flag },
+            { [classes.rightMargin]: flag },
+            { [classes.leftMargin]: !flag },
             classes.textIndicator
           )}
-          style={flag ? { marginRight: 4 } : { marginLeft: 4 }}
         >
-          {name}
+          {options.label}
         </div>
       ))
       return control
     }
 
     return (
-      <div className={classes.root}>
+      <div className={clsx(classes.root, { [classes.selected]: node.getOptions()?.selected })}>
         <p>
           <AccessAlarmIcon fontSize='small' />
           {name}

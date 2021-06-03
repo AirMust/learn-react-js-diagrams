@@ -10,8 +10,9 @@ export class ModelFFPortModel extends DefaultPortModel {
       type: MODEL_FF_NODE.NAME,
       name: `${name}/${id}`,
       label: `${name}`,
-      format: formatData,
       alignment: isInput ? 'left' : 'right',
+      in: isInput,
+      formatData,
       id,
       required,
     })

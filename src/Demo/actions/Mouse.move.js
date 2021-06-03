@@ -24,7 +24,7 @@ export class CustomMouseMoveItemsAction extends Action {
   checkLink (link) {
     const soursePort = link.getSourcePort()
     const targetPort = link.getTargetPort()
-    console.log(soursePort, targetPort)
+    // console.log(soursePort, targetPort)
     // TODO: !
     // if (soursePort && targetPort) {
     //   const sourceFormat = soursePort?.getFormat()
