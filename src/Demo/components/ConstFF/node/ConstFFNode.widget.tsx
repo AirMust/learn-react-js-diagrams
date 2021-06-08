@@ -1,22 +1,20 @@
 import * as React from 'react'
-import { ModelFFNodeModel, ModelFFPortModelProps } from './ModelFFNode.model'
+import { ConstFFNodeModel, ConstFFPortModelProps } from './ConstFFNode.model'
 import { DiagramEngine, PortWidget } from '@projectstorm/react-diagrams'
 import { memo, FC } from 'react'
-import { Divider, IconButton, makeStyles } from '@material-ui/core'
+import { Divider, makeStyles, TextField } from '@material-ui/core'
 import clsx from 'clsx'
 import AccessAlarmIcon from '@material-ui/icons/AccessAlarm'
 import { useCallback } from 'react'
 import { useState } from 'react'
-import { Clear } from '@material-ui/icons'
-import { v4 as uuid } from 'uuid'
-
-export interface ModelFFNodeWidgetProps {
-  node: ModelFFNodeModel
+import { ToggleButtonsMultiple } from './components'
+export interface ConstFFNodeWidgetProps {
+  node: ConstFFNodeModel
   engine: DiagramEngine
 }
 
 type MetaPortProps = {
-  options: ModelFFPortModelProps & {
+  options: ConstFFPortModelProps & {
     isLink?: boolean
   }
   indicator: any
@@ -36,16 +34,14 @@ const useStyles = makeStyles(theme => ({
     display: 'grid',
     minWidth: MIN_WIDTH,
     zIndex: 0,
-    gridTemplateAreas: '"head head head head" "ind1 input output ind2"',
+    gridTemplateAreas:
+      '"head head head head" "type type type ind2" "value value value ind2"',
     gridTemplateColumns: `${WIDTH}px auto auto ${WIDTH}px`,
     border: `1px solid rgba(0,0,0,0)`,
     '& > p': {
       textAlign: 'center',
       margin: theme.spacing(1),
       gridArea: 'head',
-      display: 'flex',
-      justifyContent: 'flex',
-      alignItems: 'center',
       '& > hr': {
         marginTop: theme.spacing(1)
       }
@@ -75,8 +71,7 @@ const useStyles = makeStyles(theme => ({
     },
     '& > div:nth-child(1)': {
       position: 'absolute',
-      zIndex: -1,
-      background: theme.palette.background.default
+      zIndex: -1
     },
     '& > div:nth-child(2)': {
       zIndex: 1,
@@ -122,12 +117,40 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-export const ModelFFNodeWidget: FC<ModelFFNodeWidgetProps> = memo(
+export const ConstFFNodeWidget: FC<ConstFFNodeWidgetProps> = memo(
   ({ node, engine }) => {
     const classes = useStyles()
-    const [update, setUpdate] = useState(node.meta.key || '100500')
+    const [formats, setFormats] = React.useState(() => 'n')
+    const [update, setUpdate] = useState(0)
+
+    const ports = React.useMemo(() => {
+      const dataPorts = Object.values(node.getPorts())
+      const tempPorts = dataPorts.map(obj => {
+        const opt = obj.getOptions() as ConstFFPortModelProps
+        opt.formatData = formats
+        const links = Object.values(obj.links)
+        links.forEach(element => {
+          const sourse = element.getSourcePort()
+          const target = element.getTargetPort()
+          if (!sourse || !target) {
+            element.remove()
+            engine.repaintCanvas()
+          } else {
+            const optSourse = sourse.getOptions() as ConstFFPortModelProps
+            const optTarget = target.getOptions() as ConstFFPortModelProps
+            if (optSourse.formatData !== optTarget.formatData) {
+              element.remove()
+              engine.repaintCanvas()
+            }
+          }
+        })
+        console.log(obj)
+        return obj
+      })
+      return tempPorts
+    }, [formats])
+
     const { name } = node.meta
-    const ports = node.getPorts()
     const getMetaProps = useCallback(
       (flag: boolean) => {
         const dataPorts = Object.values(ports)
@@ -135,7 +158,7 @@ export const ModelFFNodeWidget: FC<ModelFFNodeWidgetProps> = memo(
         dataPorts.forEach(port => {
           const option = port.getOptions() as any
           if (option.in === flag) {
-            const options: MetaPortProps['options'] = port.getOptions() as ModelFFPortModelProps
+            const options: MetaPortProps['options'] = port.getOptions() as ConstFFPortModelProps
 
             options.isLink = Object.keys(port.getLinks()).length !== 0
 
@@ -172,31 +195,10 @@ export const ModelFFNodeWidget: FC<ModelFFNodeWidgetProps> = memo(
       return control
     }
 
-    const nameControls = (flag: boolean) => {
-      const meta = getMetaProps(flag)
-      const control = meta.map(({ options }) => (
-        <div
-          className={clsx(
-            { [classes.rightBorder]: !flag },
-            { [classes.leftBorder]: flag },
-            { [classes.rightMargin]: flag },
-            { [classes.leftMargin]: !flag },
-            classes.textIndicator
-          )}
-        >
-          {options.label}
-        </div>
-      ))
-      return control
-    }
-
-    const logerClick = () => {
-      const x = node.meta as any
-      x.name += '1'
-      engine.repaintCanvas()
-      console.log(engine.getModel().getNodes())
-      // node.meta.key = uuid()
-      setUpdate(uuid())
+    const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { target } = event
+      const { value } = target
+      node.meta.value = value
     }
 
     return (
@@ -205,26 +207,23 @@ export const ModelFFNodeWidget: FC<ModelFFNodeWidgetProps> = memo(
           // [classes.selected]: node.getOptions()?.selected
         })}
         key={update}
-        onClick={logerClick}
       >
         <p>
           <AccessAlarmIcon fontSize='small' />
           {name}
-          <IconButton
-            aria-label='delete'
-            size='small'
-            onClick={() => {
-              node.remove()
-            }}
-          >
-            <Clear fontSize='small' style={{ color: 'red' }} />
-          </IconButton>
           <Divider />
         </p>
-        <div>{indicatorControls(true)}</div>
-        <div>{nameControls(true)}</div>
-        <div>{nameControls(false)}</div>
-        <div>{indicatorControls(false)}</div>
+        <div style={{ gridArea: 'type', margin: 4, marginTop: 0 }}>
+          <ToggleButtonsMultiple formats={formats} setFormats={setFormats} />
+        </div>
+        <TextField
+          style={{ gridArea: 'value', margin: 4 }}
+          placeholder='Value'
+          variant='outlined'
+          onChange={onChange}
+          size='small'
+        />
+        <div style={{ gridArea: 'ind2' }}>{indicatorControls(false)}</div>
       </div>
     )
   }

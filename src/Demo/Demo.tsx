@@ -21,10 +21,10 @@ import {
   Workspace
 } from './components'
 import { useState } from 'react'
+import { ConstFFNodeFactory, CONST_FF_NODE } from './components/ConstFF'
 
 type WrapDiagramProps = {
   engine: DiagramEngine
-  key: any
 }
 
 export type TrayItemWidgetProps = {
@@ -41,12 +41,11 @@ const Items: FC<TrayItemWidgetProps> = memo(({ name, color, model }) => {
         event.dataTransfer.setData('storm-diagram-node', JSON.stringify(model))
       }}
       style={{
-        color: 'white',
+        color: 'gray',
         padding: 5,
-        margin: '0px 10px',
+        margin: 10,
         border: `1px solid ${color}`,
         borderRadius: 5,
-        marginBottom: 2,
         cursor: 'pointer'
       }}
     >
@@ -55,56 +54,86 @@ const Items: FC<TrayItemWidgetProps> = memo(({ name, color, model }) => {
   )
 })
 
-const Diagrams: FC<WrapDiagramProps> = memo(({ engine, key }) => {
+const Diagrams: FC<WrapDiagramProps> = memo(({ engine }) => {
   const factories = engine.getNodeFactories().getFactories()
   const ModelFFFactory = factories.find(
     factory => factory.getType() === MODEL_FF_NODE.NAME
   )
+  // const clickUo = () => {
+  //   engine.getModel().getLayers()[0].allowRepaint();
+  //   engine.getModel().getLayers()[1].allowRepaint();
+  //   engine.repaintCanvas()
+  //   // const model = engine.getModel();
+  //   // var str = JSON.stringify(model.serialize())
 
-  return (
-    engine.getModel() &&
-    ModelFFFactory && (
-      <Panel>
-        <Workspace
-          header={<h1>Storm React Diagrams - DnD demo</h1>}
-          tools={
-            <div>
-              <h3>Tools</h3>
-              <Items model={{ type: 'in' }} name='in mode' color='red' />
-            </div>
-          }
-        >
-          <div
-            onDrop={event => {
-              const node = ModelFFFactory.generateModel({
-                initialConfig: { name: '123' }
-              })
-              const point = engine.getRelativeMousePoint(event)
-              node.setPosition(point)
+  //   // //!------------- DESERIALIZING ----------------
 
-              engine.getModel().addNode(node)
-              engine.repaintCanvas()
-            }}
-            onDragOver={event => {
-              event.preventDefault()
-            }}
-          >
-            <CanvasWidget
-              engine={engine}
-              className={'canvas-widget'}
-              key={key}
+  //   // var model2 = new DiagramModel()
+  //   // console.log(model.serialize())
+  //   // model2.deserializeModel(JSON.parse(str), engine)
+  //   // engine.setModel(model2)
+  //   // console.log(engine)
+
+  //   // const model = engine.getModel();
+  //   // const modelSerial = model.serialize();
+  //   // console.log(modelSerial)
+  //   // const model2 = new DiagramModel(modelSerial);
+  //   // // model2(modelSerial)
+  //   // // engine.mode
+  //   // engine.setModel(model2);
+  // }
+
+  return engine.getModel() && ModelFFFactory ? (
+    <Panel>
+      <Workspace
+        header={<h1>Header my app</h1>}
+        tools={
+          <div style={{ width: '100%' }}>
+            <h3>Tools</h3>
+            <button>Update</button>
+            <Items model={{ name: '0 Port' }} name='0 Port' color='red' />
+            <Items
+              model={{ name: '1-in/3-out Port' }}
+              name='4 Port'
+              color='blue'
             />
           </div>
-        </Workspace>
-      </Panel>
-    )
+        }
+      >
+        <div
+          onClick={event => engine.repaintCanvas()}
+          style={{ height: '100%' }}
+          onDrop={event => {
+            const data = JSON.parse(
+              event.dataTransfer.getData('storm-diagram-node')
+            )
+            const node = ModelFFFactory.generateModel({
+              initialConfig: { name: data.name }
+            })
+            const point = engine.getRelativeMousePoint(event)
+            node.setPosition(point)
+            engine.getModel().addNode(node)
+            engine.repaintCanvas()
+          }}
+          onDragOver={event => {
+            event.preventDefault()
+          }}
+        >
+          <CanvasWidget engine={engine} className={'canvas-widget'} />
+        </div>
+      </Workspace>
+    </Panel>
+  ) : (
+    <div>Load</div>
   )
 })
 
 export const DemoComponent: FC = memo(() => {
   const engine = createEngine({ registerDefaultDeleteItemsAction: false })
 
+  engine.getNodeFactories().registerFactory(new ConstFFNodeFactory())
   engine.getNodeFactories().registerFactory(new ModelFFNodeFactory())
+
   engine.getActionEventBus().registerAction(new CustomDeleteItemsAction())
 
   engine
@@ -128,6 +157,15 @@ export const DemoComponent: FC = memo(() => {
   const ModelFFFactory = factories.find(
     factory => factory.getType() === MODEL_FF_NODE.NAME
   )
+  const ConstFF = factories.find(
+    factory => factory.getType() === CONST_FF_NODE.NAME
+  )
+  if (ConstFF) {
+    const node = ConstFF.generateModel({
+      initialConfig: { name: 'fdsfsdfs' }
+    })
+    model.addNode(node)
+  }
   if (ModelFFFactory) {
     panel.nodes.forEach(metaNode => {
       const node = ModelFFFactory.generateModel({
@@ -135,35 +173,53 @@ export const DemoComponent: FC = memo(() => {
       })
       model.addNode(node)
     })
-    panel.links.forEach(link => {
-      const { input, output } = link
-      let p1 = null
-      let p2 = null
-      model.getNodes().forEach(nodes => {
-        Object.values(nodes.getPorts()).forEach(port => {
-          if (port.getID() === input) {
-            p1 = port
-          }
-          if (port.getID() === output) {
-            p2 = port
-          }
-        })
-      })
-      if (p1 && p2) {
-        let link: LinkModel = (p1 as any).link(p2)
-        model.addLink(link)
-      }
-    })
+    // panel.links.forEach(link => {
+    //   const { input, output } = link
+    //   let p1 = null
+    //   let p2 = null
+    //   model.getNodes().forEach(nodes => {
+    //     Object.values(nodes.getPorts()).forEach(port => {
+    //       if (port.getID() === input) {
+    //         p1 = port
+    //       }
+    //       if (port.getID() === output) {
+    //         p2 = port
+    //       }
+    //     })
+    //   })
+    //   if (p1 && p2) {
+    //     let link: LinkModel = (p1 as any).link(p2)
+    //     model.addLink(link)
+    //   }
+    // })
   }
+
   model.setGridSize(10)
   engine.setModel(model)
 
-  engine.getModel().registerListener({
-    linksUpdated: (l: any) => {},
-    nodesUpdated: (n: any) => {
-      console.log(n)
+
+  // engine.getModel().registerListener({
+  //   linksUpdated: (l: any) => {},
+  //   nodesUpdated: (n: any) => {
+  //     console.log(n)
+  //   }
+  // })
+
+  model.registerListener({
+    linksUpdated: (e: any) => {
+      if (e.isCreated) {
+        const link = e.link
+        const sourcePort = link.getSourcePort() as ModelFFPortModel
+
+        if (Object.keys(sourcePort.getLinks()).length > 1) {
+          link.remove()
+        } else if (sourcePort.getOptions().in) {
+          link.remove()
+        }
+      }
     }
   })
+
   engine.getActionEventBus().registerAction(new CustomMouseMoveItemsAction())
 
   const click = () => {

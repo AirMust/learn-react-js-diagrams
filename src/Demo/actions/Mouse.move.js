@@ -1,5 +1,5 @@
 import { Action, InputType } from '@projectstorm/react-canvas-core'
-
+import { v4 as uuid } from 'uuid'
 // interface CustomDeleteItemsActionOptions {
 //   keyCodes?: number[]
 // }
@@ -24,9 +24,12 @@ export class CustomMouseMoveItemsAction extends Action {
   checkLink (link) {
     const soursePort = link.getSourcePort()
     const targetPort = link.getTargetPort()
-    // console.log(soursePort, targetPort)
     // TODO: !
-    // if (soursePort && targetPort) {
+    if (soursePort && targetPort) {
+      console.log(soursePort, targetPort)
+      // soursePort.parent.meta.key = uuid()
+      // targetPort.parent.meta.key = uuid()
+    }
     //   const sourceFormat = soursePort?.getFormat()
     //   const targetFormat = targetPort?.getFormat()
     //   if (sourceFormat !== targetFormat) {
@@ -41,7 +44,7 @@ export class CustomMouseMoveItemsAction extends Action {
     if (event.target?.localName !== 'circle') {
       const model = this.engine.getModel()
       const links = model.getLinks()
-      links.forEach(this.checkLink)
+      links.forEach(obj => this.checkLink(obj))
     }
   }
 }
