@@ -9,27 +9,30 @@ const useStyles = makeStyles(theme => ({
     borderRadius: 5,
     overflow: 'hidden',
     '& > div:nth-child(1)': {
-      background: 'black',
+      background: theme.palette.background.paper,
+      boxShadow: theme.shadows[2],
+
       padding: theme.spacing(1),
       display: 'flex',
-      flexShrink: 0
+      flexShrink: 0,
+      marginBottom: 2,
     },
     '& > div:nth-child(2)': {
       flexGrow: 1,
       height: '100%',
       display: 'flex',
-	  '& > div:nth-child(1)': {
-		background: 'black',
-		padding: theme.spacing(1),
-		display: 'flex',
-		flexShrink: 0,
-		minWidth: 200,
-	  },
-	  '& > div:nth-child(2)': {
-		flexGrow: 1,
-		height: '100%',
-		position: "relative",
-	  }
+      '& > div:nth-child(1)': {
+        background: theme.palette.background.paper,
+        padding: theme.spacing(1),
+        display: 'flex',
+        flexShrink: 0,
+        minWidth: 200
+      },
+      '& > div:nth-child(2)': {
+        flexGrow: 1,
+        height: '100%',
+        position: 'relative'
+      }
     }
   }
 }))

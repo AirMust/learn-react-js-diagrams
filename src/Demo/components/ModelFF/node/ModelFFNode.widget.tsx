@@ -6,6 +6,7 @@ import { Divider, makeStyles } from '@material-ui/core'
 import clsx from 'clsx'
 import AccessAlarmIcon from '@material-ui/icons/AccessAlarm'
 import { useCallback } from 'react'
+import { useState } from 'react'
 export interface ModelFFNodeWidgetProps {
   node: ModelFFNodeModel
   engine: DiagramEngine
@@ -124,6 +125,7 @@ const useStyles = makeStyles(theme => ({
 export const ModelFFNodeWidget: FC<ModelFFNodeWidgetProps> = memo(
   ({ node, engine }) => {
     const classes = useStyles()
+    const [update, setUpdate] = useState(0)
 
     const { name } = node.meta
     const ports = node.getPorts()
@@ -151,7 +153,6 @@ export const ModelFFNodeWidget: FC<ModelFFNodeWidgetProps> = memo(
 
     const indicatorControls = (flag: boolean) => {
       const meta = getMetaProps(flag)
-      console.log(meta)
       const control = meta.map(({ indicator, options }) => (
         <PortWidget port={indicator} engine={engine} className={classes.port}>
           <div />
@@ -190,8 +191,22 @@ export const ModelFFNodeWidget: FC<ModelFFNodeWidgetProps> = memo(
       return control
     }
 
+    const logerClick = () => {
+      const x = node.meta as any
+      x.name += '1'
+      engine.repaintCanvas()
+      console.log(x)
+      setUpdate(update + 1)
+    }
+
     return (
-      <div className={clsx(classes.root, { [classes.selected]: node.getOptions()?.selected })}>
+      <div
+        className={clsx(classes.root, {
+          [classes.selected]: node.getOptions()?.selected
+        })}
+        key={update}
+        onClick={logerClick}
+      >
         <p>
           <AccessAlarmIcon fontSize='small' />
           {name}
