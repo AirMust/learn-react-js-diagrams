@@ -2,7 +2,7 @@ import * as React from 'react'
 import { ConstFFNodeModel, ConstFFPortModelProps } from './ConstFFNode.model'
 import { DiagramEngine, PortWidget } from '@projectstorm/react-diagrams'
 import { memo, FC } from 'react'
-import { Divider, makeStyles, TextField } from '@material-ui/core'
+import { Divider, makeStyles, TextField, IconButton } from '@material-ui/core'
 import clsx from 'clsx'
 import AccessAlarmIcon from '@material-ui/icons/AccessAlarm'
 import { useCallback } from 'react'
@@ -11,6 +11,7 @@ import { ToggleButtonsMultiple } from './components'
 import { useSelector } from 'react-redux'
 import { modelSelector } from '../../../../core/store'
 import { useEffect } from 'react'
+import { BorderAll, Clear } from '@material-ui/icons'
 export interface ConstFFNodeWidgetProps {
   node: ConstFFNodeModel
   engine: DiagramEngine
@@ -41,10 +42,15 @@ const useStyles = makeStyles(theme => ({
       '"head head head head" "type type type ind2" "value value value ind2"',
     gridTemplateColumns: `${WIDTH}px auto auto ${WIDTH}px`,
     border: `1px solid rgba(0,0,0,0)`,
-    '& > p': {
+    '& > div:nth-child(1)': {
       textAlign: 'center',
       margin: theme.spacing(1),
       gridArea: 'head',
+      '& > div:nth-child(1)': {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      },
       '& > hr': {
         marginTop: theme.spacing(1)
       }
@@ -122,11 +128,10 @@ const useStyles = makeStyles(theme => ({
 
 export const ConstFFNodeWidget: FC<ConstFFNodeWidgetProps> = memo(
   ({ node, engine }) => {
-
-    const meta = useSelector(modelSelector);
+    const meta = useSelector(modelSelector)
 
     useEffect(() => {
-      console.log(meta);
+      console.log(meta)
     }, [meta])
 
     const classes = useStyles()
@@ -154,7 +159,7 @@ export const ConstFFNodeWidget: FC<ConstFFNodeWidgetProps> = memo(
             }
           }
         })
-        console.log(obj)
+        // console.log(obj)
         return obj
       })
       return tempPorts
@@ -218,11 +223,22 @@ export const ConstFFNodeWidget: FC<ConstFFNodeWidgetProps> = memo(
         })}
         key={update}
       >
-        <p>
-          <AccessAlarmIcon fontSize='small' />
-          {name}
+        <div>
+          <div>
+            <BorderAll fontSize='small' />
+            {name}
+            <IconButton
+            aria-label='delete'
+            size='small'
+            onClick={() => {
+              node.remove()
+            }}
+          >
+            <Clear fontSize='small' style={{ color: 'red' }} />
+          </IconButton>
+          </div>
           <Divider />
-        </p>
+        </div>
         <div style={{ gridArea: 'type', margin: 4, marginTop: 0 }}>
           <ToggleButtonsMultiple formats={formats} setFormats={setFormats} />
         </div>

@@ -1,6 +1,7 @@
 import { ActionProps, MODEL } from '../actions/actions.types'
+import { StoreModelProps } from '../store.types'
 
-export const initialStateTheme: any = null
+export const initialStateTheme: StoreModelProps = {}
 
 export const modelReducer = (
   state = initialStateTheme,

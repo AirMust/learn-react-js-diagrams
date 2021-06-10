@@ -24,8 +24,8 @@ import { useState } from 'react'
 import { ConstFFNodeFactory, CONST_FF_NODE } from './components/ConstFF'
 import { ConstFFNodeModel } from './components/ConstFF/node/ConstFFNode.model'
 import { useDispatch } from 'react-redux'
-import { setModelThunk } from '../core/store/actions/model.actions'
-import { DefaultState } from './state/DefState';
+import { cpNodeThunk, setModelThunk } from '../core/store/actions/model.actions'
+import { DefaultState } from './state/DefState'
 import StatesDown from './state/DefStateDown'
 import commandHandlers from './handler/commandHandlers'
 import CommandManager from './handler/CommandManager'
@@ -120,7 +120,7 @@ const Diagrams: FC<WrapDiagramProps> = memo(({ engine }) => {
 
             node.registerListener({
               nodeLinkAdded: (e: any) => {
-                console.log(e);
+                console.log(e)
               }
             })
 
@@ -166,6 +166,8 @@ export const DemoComponent: FC = memo(() => {
 
   // engine.maxNumberPointsPerLink = 0
 
+  const dispatch = useDispatch()
+
   const model = new DiagramModel()
   const [up, setUp] = useState('43')
   const factories = engine.getNodeFactories().getFactories()
@@ -178,7 +180,7 @@ export const DemoComponent: FC = memo(() => {
   )
   if (ConstFF) {
     const node = ConstFF.generateModel({
-      initialConfig: { name: 'fdsfsdfs' }
+      initialConfig: { name: 'fdsfsdfs', dispatch: dispatch }
     })
     model.addNode(node)
   }
@@ -186,7 +188,7 @@ export const DemoComponent: FC = memo(() => {
   if (ModelFFFactory) {
     panel.nodes.forEach(metaNode => {
       const node = ModelFFFactory.generateModel({
-        initialConfig: { ...metaNode }
+        initialConfig: { ...metaNode, dispatch: dispatch }
       })
       model.addNode(node)
     })
@@ -214,66 +216,54 @@ export const DemoComponent: FC = memo(() => {
   model.setGridSize(10)
   engine.setModel(model)
 
-  const dispatch = useDispatch();
-
-  setTimeout(() =>{
-    const nodes = engine.getModel().getNodes();
-    const meta = nodes.map(obj => {
-      const node: any = obj;
-      return {...node.meta, ...node.getOptions()}
-    })
+  useEffect(() => {
+    const nodes = engine.getModel().getNodes()
+    const meta = nodes.reduce((result: any, obj) => {
+      const node: any = obj
+      const id = node.getOptions().id;
+      result[id] = { ...node.meta, ...node.getOptions() }
+      return result
+    }, {})
     // const node: any = nodes[3];
     // console.log({...node.meta, ...node.getOptions()})
     dispatch(setModelThunk(meta))
-  }, 1000)
+  }, [model])
 
+  // setTimeout(() =>{
+  //   const nodes = engine.getModel().getNodes();
+  //   const meta = nodes.map(obj => {
+  //     const node: any = obj;
+  //     node.meta.name = `${node.meta.name}_${node.meta.name}`;
 
-  setTimeout(() =>{
-    const nodes = engine.getModel().getNodes();
-    const meta = nodes.map(obj => {
-      const node: any = obj;
-      node.meta.name = `${node.meta.name}_${node.meta.name}`;
-
-      return {...node.meta, ...node.getOptions()}
-    })
-    // const node: any = nodes[3];
-    // console.log({...node.meta, ...node.getOptions()})
-    dispatch(setModelThunk(meta))
-  }, 4000)
-
-
+  //     return {...node.meta, ...node.getOptions()}
+  //   })
+  //   // const node: any = nodes[3];
+  //   // console.log({...node.meta, ...node.getOptions()})
+  //   dispatch(setModelThunk(meta))
+  // }, 4000)
 
   model.registerListener({
-    sourcePortChanged: (e: any) => {
-      console.log(e)
-
-    },
-    linkSetSourcePort: (e: any) => {
-      console.log(e)
-    },
     linksUpdated: (e: any) => {
+
       if (e.isCreated) {
         const link = e.link
         const sourcePort = link.getSourcePort() as ModelFFPortModel
-
         if (Object.keys(sourcePort.getLinks()).length > 1) {
           link.remove()
         } else if (sourcePort.getOptions().in) {
           link.remove()
         }
       }
+      else{
+        dispatch(cpNodeThunk())
+      }
     }
   })
   // engine.getActionEventBus().registerAction()
-  engine.getStateMachine().pushState(new StatesUp());
-  engine.getStateMachine().pushState(new StatesDown());
+  engine.getStateMachine().pushState(new StatesUp())
+  engine.getStateMachine().pushState(new StatesDown())
 
   engine.getActionEventBus().registerAction(new CustomMouseMoveItemsAction())
-  engine.registerListener({
-    linkAdded: ({ link }: any) => {
-      console.log(link, 'links added')
-    },
-  });
   // engine.getStateMachine().pushState(new DefaultState());
 
   const click = () => {

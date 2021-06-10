@@ -21,6 +21,7 @@ export class ModelFFNodeFactory extends AbstractReactFactory<
   }
 
   generateModel (props: any) {
-    return new ModelFFNodeModel(props)
+    const node = new ModelFFNodeModel(props)
+    return node
   }
 }

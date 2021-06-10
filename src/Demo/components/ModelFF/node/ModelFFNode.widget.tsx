@@ -42,13 +42,15 @@ const useStyles = makeStyles(theme => ({
     gridTemplateAreas: '"head head head head" "ind1 input output ind2"',
     gridTemplateColumns: `${WIDTH}px auto auto ${WIDTH}px`,
     border: `1px solid rgba(0,0,0,0)`,
-    '& > p': {
+    '& > div:nth-child(1)': {
       textAlign: 'center',
       margin: theme.spacing(1),
       gridArea: 'head',
-      display: 'flex',
-      justifyContent: 'flex',
-      alignItems: 'center',
+      '& > div:nth-child(1)': {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      },
       '& > hr': {
         marginTop: theme.spacing(1)
       }
@@ -129,10 +131,10 @@ export const ModelFFNodeWidget: FC<ModelFFNodeWidgetProps> = memo(
   ({ node, engine }) => {
     const classes = useStyles()
 
-    const meta = useSelector(modelSelector);
+    const meta = useSelector(modelSelector)
 
     useEffect(() => {
-      console.log(meta);
+      console.log(meta)
     }, [meta])
 
     const [update, setUpdate] = useState(node.meta.key || '100500')
@@ -200,14 +202,14 @@ export const ModelFFNodeWidget: FC<ModelFFNodeWidgetProps> = memo(
       return control
     }
 
-    const logerClick = () => {
-      const x = node.meta as any
-      x.name += '1'
-      engine.repaintCanvas()
-      console.log(engine.getModel().getNodes())
-      // node.meta.key = uuid()
-      setUpdate(uuid())
-    }
+    // const logerClick = () => {
+    //   const x = node.meta as any
+    //   x.name += '1'
+    //   engine.repaintCanvas()
+    //   console.log(engine.getModel().getNodes())
+    //   // node.meta.key = uuid()
+    //   setUpdate(uuid())
+    // }
 
     return (
       <div
@@ -215,22 +217,24 @@ export const ModelFFNodeWidget: FC<ModelFFNodeWidgetProps> = memo(
           // [classes.selected]: node.getOptions()?.selected
         })}
         key={update}
-        onClick={logerClick}
+        // onClick={logerClick}
       >
-        <p>
-          <AccessAlarmIcon fontSize='small' />
-          {name}
-          <IconButton
-            aria-label='delete'
-            size='small'
-            onClick={() => {
-              node.remove()
-            }}
-          >
-            <Clear fontSize='small' style={{ color: 'red' }} />
-          </IconButton>
+        <div>
+          <div>
+            <AccessAlarmIcon fontSize='small' />
+            {name}
+            <IconButton
+              aria-label='delete'
+              size='small'
+              onClick={() => {
+                node.remove()
+              }}
+            >
+              <Clear fontSize='small' style={{ color: 'red' }} />
+            </IconButton>
+          </div>
           <Divider />
-        </p>
+        </div>
         <div>{indicatorControls(true)}</div>
         <div>{nameControls(true)}</div>
         <div>{nameControls(false)}</div>

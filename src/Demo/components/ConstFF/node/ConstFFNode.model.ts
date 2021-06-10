@@ -23,6 +23,7 @@ type ConstFFNodeModelProps = {
   ports?: { [key: string]: ConstFFPortModelProps }
   icon?: string
   value?: string
+  dispatch?: any
 }
 
 type ConstFFNodeModelInitProps = {
@@ -38,7 +39,7 @@ export class ConstFFNodeModel extends NodeModel<
     super({
       type: CONST_FF_NODE.NAME
     })
-    const { name, ports, icon } = initialConfig
+    const { name, ports, icon, dispatch } = initialConfig
     this.meta = { name, icon }
     this.addPort(
       new ConstFFPortModel({
@@ -46,11 +47,9 @@ export class ConstFFNodeModel extends NodeModel<
         id: '1043',
         formatData: 'number',
         isInput: false,
-        required: true
+        required: true,
+        dispatch
       })
     )
-    Object.values(this.ports).forEach(element => {
-      console.log(element)
-    })
   }
 }

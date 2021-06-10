@@ -1,4 +1,15 @@
+import { ModelFFNodeModelProps } from "../../Demo/components/ModelFF/node/ModelFFNode.model"
+
 export interface StoreProps {
   lang: 'ru' | 'en',
-  model: any,
+  model: StoreModelProps,
+}
+
+
+export type StoreModelProps = {
+  [k: string]: StoreNodeProps
+}
+
+export type StoreNodeProps = ModelFFNodeModelProps & {
+  id: string
 }

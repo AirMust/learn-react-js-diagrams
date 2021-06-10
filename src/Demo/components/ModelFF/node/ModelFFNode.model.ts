@@ -5,7 +5,7 @@ import {
 } from '@projectstorm/react-diagrams'
 import { MODEL_FF_NODE } from './ModelFFNode.factory'
 import { ModelFFPortModel } from '../port'
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid } from 'uuid'
 
 export interface ModelFFNodeModelGenerics {
   PORT: ModelFFPortModel
@@ -19,11 +19,12 @@ export type ModelFFPortModelProps = DefaultPortModelOptions & {
   id: string
 }
 
-type ModelFFNodeModelProps = {
+export type ModelFFNodeModelProps = {
   name: string
   ports?: { [key: string]: ModelFFPortModelProps }
-  icon?: string,
-  key?: string,
+  icon?: string
+  key?: string
+  dispatch?: any
 }
 
 type ModelFFNodeModelInitProps = {
@@ -39,13 +40,13 @@ export class ModelFFNodeModel extends NodeModel<
     super({
       type: MODEL_FF_NODE.NAME
     })
-    const { name, ports, icon } = initialConfig
-    const key = uuid();
+    const { name, ports, icon, dispatch } = initialConfig
+    const key = uuid()
     this.meta = { name, icon, key }
     if (ports) {
       const lists = Object.entries(ports)
       lists.forEach(([key, data]) => {
-        this.addPort(new ModelFFPortModel({ ...data, id: key }))
+        this.addPort(new ModelFFPortModel({ ...data, id: key, dispatch }))
       })
     }
   }
