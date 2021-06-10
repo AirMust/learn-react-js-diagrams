@@ -17,7 +17,6 @@ export class ConstFFPortModel extends DefaultPortModel {
       required,
     })
   }
-
   getFormat () {
     const typeData = this.getOptions().format
     return typeData

@@ -49,5 +49,8 @@ export class ConstFFNodeModel extends NodeModel<
         required: true
       })
     )
+    Object.values(this.ports).forEach(element => {
+      console.log(element)
+    })
   }
 }

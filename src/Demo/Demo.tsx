@@ -1,4 +1,4 @@
-import React, { FC, memo, useRef } from 'react'
+import React, { FC, memo, useEffect, useRef } from 'react'
 import createEngine, {
   DiagramModel,
   DiagramEngine,
@@ -22,7 +22,14 @@ import {
 } from './components'
 import { useState } from 'react'
 import { ConstFFNodeFactory, CONST_FF_NODE } from './components/ConstFF'
-
+import { ConstFFNodeModel } from './components/ConstFF/node/ConstFFNode.model'
+import { useDispatch } from 'react-redux'
+import { setModelThunk } from '../core/store/actions/model.actions'
+import { DefaultState } from './state/DefState';
+import StatesDown from './state/DefStateDown'
+import commandHandlers from './handler/commandHandlers'
+import CommandManager from './handler/CommandManager'
+import StatesUp from './state/DefStateUp'
 type WrapDiagramProps = {
   engine: DiagramEngine
 }
@@ -110,6 +117,13 @@ const Diagrams: FC<WrapDiagramProps> = memo(({ engine }) => {
             const node = ModelFFFactory.generateModel({
               initialConfig: { name: data.name }
             })
+
+            node.registerListener({
+              nodeLinkAdded: (e: any) => {
+                console.log(e);
+              }
+            })
+
             const point = engine.getRelativeMousePoint(event)
             node.setPosition(point)
             engine.getModel().addNode(node)
@@ -150,6 +164,8 @@ export const DemoComponent: FC = memo(() => {
       )
     )
 
+  // engine.maxNumberPointsPerLink = 0
+
   const model = new DiagramModel()
   const [up, setUp] = useState('43')
   const factories = engine.getNodeFactories().getFactories()
@@ -166,6 +182,7 @@ export const DemoComponent: FC = memo(() => {
     })
     model.addNode(node)
   }
+
   if (ModelFFFactory) {
     panel.nodes.forEach(metaNode => {
       const node = ModelFFFactory.generateModel({
@@ -197,15 +214,43 @@ export const DemoComponent: FC = memo(() => {
   model.setGridSize(10)
   engine.setModel(model)
 
+  const dispatch = useDispatch();
 
-  // engine.getModel().registerListener({
-  //   linksUpdated: (l: any) => {},
-  //   nodesUpdated: (n: any) => {
-  //     console.log(n)
-  //   }
-  // })
+  setTimeout(() =>{
+    const nodes = engine.getModel().getNodes();
+    const meta = nodes.map(obj => {
+      const node: any = obj;
+      return {...node.meta, ...node.getOptions()}
+    })
+    // const node: any = nodes[3];
+    // console.log({...node.meta, ...node.getOptions()})
+    dispatch(setModelThunk(meta))
+  }, 1000)
+
+
+  setTimeout(() =>{
+    const nodes = engine.getModel().getNodes();
+    const meta = nodes.map(obj => {
+      const node: any = obj;
+      node.meta.name = `${node.meta.name}_${node.meta.name}`;
+
+      return {...node.meta, ...node.getOptions()}
+    })
+    // const node: any = nodes[3];
+    // console.log({...node.meta, ...node.getOptions()})
+    dispatch(setModelThunk(meta))
+  }, 4000)
+
+
 
   model.registerListener({
+    sourcePortChanged: (e: any) => {
+      console.log(e)
+
+    },
+    linkSetSourcePort: (e: any) => {
+      console.log(e)
+    },
     linksUpdated: (e: any) => {
       if (e.isCreated) {
         const link = e.link
@@ -219,8 +264,17 @@ export const DemoComponent: FC = memo(() => {
       }
     }
   })
+  // engine.getActionEventBus().registerAction()
+  engine.getStateMachine().pushState(new StatesUp());
+  engine.getStateMachine().pushState(new StatesDown());
 
   engine.getActionEventBus().registerAction(new CustomMouseMoveItemsAction())
+  engine.registerListener({
+    linkAdded: ({ link }: any) => {
+      console.log(link, 'links added')
+    },
+  });
+  // engine.getStateMachine().pushState(new DefaultState());
 
   const click = () => {
     let model = engine.getModel()

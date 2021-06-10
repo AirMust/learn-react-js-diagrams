@@ -9,6 +9,9 @@ import { useCallback } from 'react'
 import { useState } from 'react'
 import { Clear } from '@material-ui/icons'
 import { v4 as uuid } from 'uuid'
+import { useSelector } from 'react-redux'
+import { useEffect } from 'react'
+import { modelSelector } from '../../../../core/store/selectors'
 
 export interface ModelFFNodeWidgetProps {
   node: ModelFFNodeModel
@@ -125,6 +128,13 @@ const useStyles = makeStyles(theme => ({
 export const ModelFFNodeWidget: FC<ModelFFNodeWidgetProps> = memo(
   ({ node, engine }) => {
     const classes = useStyles()
+
+    const meta = useSelector(modelSelector);
+
+    useEffect(() => {
+      console.log(meta);
+    }, [meta])
+
     const [update, setUpdate] = useState(node.meta.key || '100500')
     const { name } = node.meta
     const ports = node.getPorts()

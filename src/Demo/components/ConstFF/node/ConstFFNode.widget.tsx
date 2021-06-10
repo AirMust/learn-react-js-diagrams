@@ -8,6 +8,9 @@ import AccessAlarmIcon from '@material-ui/icons/AccessAlarm'
 import { useCallback } from 'react'
 import { useState } from 'react'
 import { ToggleButtonsMultiple } from './components'
+import { useSelector } from 'react-redux'
+import { modelSelector } from '../../../../core/store'
+import { useEffect } from 'react'
 export interface ConstFFNodeWidgetProps {
   node: ConstFFNodeModel
   engine: DiagramEngine
@@ -119,6 +122,13 @@ const useStyles = makeStyles(theme => ({
 
 export const ConstFFNodeWidget: FC<ConstFFNodeWidgetProps> = memo(
   ({ node, engine }) => {
+
+    const meta = useSelector(modelSelector);
+
+    useEffect(() => {
+      console.log(meta);
+    }, [meta])
+
     const classes = useStyles()
     const [formats, setFormats] = React.useState(() => 'n')
     const [update, setUpdate] = useState(0)
