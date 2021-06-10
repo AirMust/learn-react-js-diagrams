@@ -42,16 +42,16 @@ export default class StatesDown extends State {
           const element = this.engine
             .getActionEventBus()
             .getModelForEvent(event)
-            console.log(event, element, 'reg')
-
+          console.log(event, element, 'reg', this.engine.getModel())
           // The canvas was clicked on, transition to the dragging canvas state
           if (!element) {
+            this.checkLinks()
             this.transitionWithEvent(this.dragCanvas, event)
           }
           // Initiate dragging a new link
           else if (element instanceof PortModel) {
             this.transitionWithEvent(this.dragNewLink, event)
-            console.log('creat', element)
+            // console.log('creat', element)
           }
           // Link selection <============================================
           else if (element instanceof LinkModel) {
@@ -59,11 +59,32 @@ export default class StatesDown extends State {
           }
           // Move items
           else {
-			    console.log(event, element)
+            // console.log(event, element)
             this.transitionWithEvent(this.dragItems, event)
           }
         }
       })
     )
+  }
+
+  checkLink (link) {
+    const soursePort = link.getSourcePort()
+    const targetPort = link.getTargetPort()
+    // TODO: !
+    console.log(soursePort, targetPort, 'ref')
+    if (!soursePort || !targetPort) {
+      link.remove()
+    } else {
+      const sourceOpt = soursePort?.getOptions()
+      const targetOpt = targetPort?.getOptions()
+      if (sourceOpt?.formatData !== targetOpt?.formatData) {
+        link.remove()
+      }
+    }
+  }
+  checkLinks () {
+    const model = this.engine.getModel()
+    const links = model.getLinks()
+    links.forEach(obj => this.checkLink(obj))
   }
 }
