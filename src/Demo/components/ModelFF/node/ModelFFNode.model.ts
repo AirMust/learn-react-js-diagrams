@@ -35,7 +35,7 @@ export class ModelFFNodeModel extends NodeModel<
   NodeModelGenerics & ModelFFNodeModelGenerics
 > {
   meta: ModelFFNodeModelProps
-
+  header: any
   constructor ({ initialConfig }: ModelFFNodeModelInitProps) {
     super({
       type: MODEL_FF_NODE.NAME
@@ -43,6 +43,11 @@ export class ModelFFNodeModel extends NodeModel<
     const { name, ports, icon, dispatch } = initialConfig
     const key = uuid()
     this.meta = { name, icon, key }
+    this.header = {
+      tooltip: 'Тип узла: Модель',
+      color: '#f44336',
+      icon: 'offline_bolt'
+    }
     if (ports) {
       const lists = Object.entries(ports)
       lists.forEach(([key, data]) => {

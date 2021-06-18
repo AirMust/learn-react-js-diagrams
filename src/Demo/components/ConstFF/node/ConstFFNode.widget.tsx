@@ -2,7 +2,14 @@ import * as React from 'react'
 import { ConstFFNodeModel, ConstFFPortModelProps } from './ConstFFNode.model'
 import { DiagramEngine, PortWidget } from '@projectstorm/react-diagrams'
 import { memo, FC } from 'react'
-import { Divider, makeStyles, TextField, IconButton } from '@material-ui/core'
+import {
+  Divider,
+  makeStyles,
+  TextField,
+  IconButton,
+  Tooltip,
+  Icon
+} from '@material-ui/core'
 import clsx from 'clsx'
 import AccessAlarmIcon from '@material-ui/icons/AccessAlarm'
 import { useCallback } from 'react'
@@ -12,6 +19,7 @@ import { useSelector } from 'react-redux'
 import { modelSelector } from '../../../../core/store'
 import { useEffect } from 'react'
 import { BorderAll, Clear } from '@material-ui/icons'
+import { HeaderNode } from '../../HeaderNode'
 export interface ConstFFNodeWidgetProps {
   node: ConstFFNodeModel
   engine: DiagramEngine
@@ -34,7 +42,7 @@ const useStyles = makeStyles(theme => ({
     position: 'relative',
     background: theme.palette.background.paper,
     boxShadow: theme.shadows[1],
-    borderRadius: theme.shape.borderRadius,
+    borderRadius: theme.shape.borderRadius * 2,
     display: 'grid',
     minWidth: MIN_WIDTH,
     zIndex: 0,
@@ -42,19 +50,6 @@ const useStyles = makeStyles(theme => ({
       '"head head head head" "type type type ind2" "value value value ind2"',
     gridTemplateColumns: `${WIDTH}px auto auto ${WIDTH}px`,
     border: `1px solid rgba(0,0,0,0)`,
-    '& > div:nth-child(1)': {
-      textAlign: 'center',
-      margin: theme.spacing(1),
-      gridArea: 'head',
-      '& > div:nth-child(1)': {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-      },
-      '& > hr': {
-        marginTop: theme.spacing(1)
-      }
-    },
     '& *': {
       textAlign: 'center'
     },
@@ -136,7 +131,6 @@ export const ConstFFNodeWidget: FC<ConstFFNodeWidgetProps> = memo(
 
     const classes = useStyles()
     const [formats, setFormats] = React.useState(() => 'n')
-    const [update, setUpdate] = useState(0)
 
     const ports = React.useMemo(() => {
       const dataPorts = Object.values(node.getPorts())
@@ -159,7 +153,6 @@ export const ConstFFNodeWidget: FC<ConstFFNodeWidgetProps> = memo(
             }
           }
         })
-        // console.log(obj)
         return obj
       })
       return tempPorts
@@ -217,28 +210,8 @@ export const ConstFFNodeWidget: FC<ConstFFNodeWidgetProps> = memo(
     }
 
     return (
-      <div
-        className={clsx(classes.root, {
-          // [classes.selected]: node.getOptions()?.selected
-        })}
-        key={update}
-      >
-        <div>
-          <div>
-            <BorderAll fontSize='small' />
-            {name}
-            <IconButton
-            aria-label='delete'
-            size='small'
-            onClick={() => {
-              node.remove()
-            }}
-          >
-            <Clear fontSize='small' style={{ color: 'red' }} />
-          </IconButton>
-          </div>
-          <Divider />
-        </div>
+      <div className={clsx(classes.root)}>
+        <HeaderNode name={name} node={node} />
         <div style={{ gridArea: 'type', margin: 4, marginTop: 0 }}>
           <ToggleButtonsMultiple formats={formats} setFormats={setFormats} />
         </div>

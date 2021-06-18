@@ -12,6 +12,7 @@ import { v4 as uuid } from 'uuid'
 import { useSelector } from 'react-redux'
 import { useEffect } from 'react'
 import { modelSelector } from '../../../../core/store/selectors'
+import { HeaderNode } from '../../HeaderNode'
 
 export interface ModelFFNodeWidgetProps {
   node: ModelFFNodeModel
@@ -42,19 +43,6 @@ const useStyles = makeStyles(theme => ({
     gridTemplateAreas: '"head head head head" "ind1 input output ind2"',
     gridTemplateColumns: `${WIDTH}px auto auto ${WIDTH}px`,
     border: `1px solid rgba(0,0,0,0)`,
-    '& > div:nth-child(1)': {
-      textAlign: 'center',
-      margin: theme.spacing(1),
-      gridArea: 'head',
-      '& > div:nth-child(1)': {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      },
-      '& > hr': {
-        marginTop: theme.spacing(1)
-      }
-    },
     '& *': {
       textAlign: 'center'
     },
@@ -75,8 +63,8 @@ const useStyles = makeStyles(theme => ({
     margin: `${theme.spacing(0.5)}px 0px`,
     position: 'relative',
     '& > div': {
-      height: HEIGHT,
-      width: WIDTH
+      width: WIDTH,
+      // padding: '4px 0px',
     },
     '& > div:nth-child(1)': {
       position: 'absolute',
@@ -93,12 +81,11 @@ const useStyles = makeStyles(theme => ({
     }
   },
   textIndicator: {
-    height: HEIGHT,
     zIndex: 1,
     minWidth: WIDTH_TEXT,
     background: theme.palette.background.default,
     padding: `0px ${theme.spacing(0.5)}px`,
-    margin: `${theme.spacing(0.5)}px 0px`,
+    // margin: `${theme.spacing(0.5)}px 0px`,
     display: 'table'
   },
   leftBorder: {
@@ -187,16 +174,15 @@ export const ModelFFNodeWidget: FC<ModelFFNodeWidgetProps> = memo(
     const nameControls = (flag: boolean) => {
       const meta = getMetaProps(flag)
       const control = meta.map(({ options }) => (
-        <div
-          className={clsx(
+        <div style={{display: 'flex', justifyContent: !flag ? 'flex-end' : 'end', margin: '4px 0px'}}
+        >
+          <div className={clsx(
             { [classes.rightBorder]: !flag },
             { [classes.leftBorder]: flag },
             { [classes.rightMargin]: flag },
             { [classes.leftMargin]: !flag },
             classes.textIndicator
-          )}
-        >
-          {options.label}
+          )}>{options.label}</div>
         </div>
       ))
       return control
@@ -219,22 +205,7 @@ export const ModelFFNodeWidget: FC<ModelFFNodeWidgetProps> = memo(
         key={update}
         // onClick={logerClick}
       >
-        <div>
-          <div>
-            <AccessAlarmIcon fontSize='small' />
-            {name}
-            <IconButton
-              aria-label='delete'
-              size='small'
-              onClick={() => {
-                node.remove()
-              }}
-            >
-              <Clear fontSize='small' style={{ color: 'red' }} />
-            </IconButton>
-          </div>
-          <Divider />
-        </div>
+        <HeaderNode name={name} node={node} />
         <div>{indicatorControls(true)}</div>
         <div>{nameControls(true)}</div>
         <div>{nameControls(false)}</div>

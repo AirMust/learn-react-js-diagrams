@@ -180,7 +180,7 @@ export const DemoComponent: FC = memo(() => {
   )
   if (ConstFF) {
     const node = ConstFF.generateModel({
-      initialConfig: { name: 'fdsfsdfs', dispatch: dispatch }
+      initialConfig: { name: 'Вспомогательный элемент', dispatch: dispatch }
     })
     model.addNode(node)
   }
